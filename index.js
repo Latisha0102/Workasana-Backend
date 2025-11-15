@@ -16,7 +16,13 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const app = express();
-app.use(cors());
+
+const corsOption = {
+  origin: "*",
+  credentials: true,
+};
+
+app.use(cors(corsOption));
 app.use(express.json());
 
 mongoose
