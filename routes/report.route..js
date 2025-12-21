@@ -4,7 +4,6 @@ const Task = require("../models/task.model");
 
 const router = express.Router();
 
-// GET /report/last-week - Fetch tasks completed in the last week
 router.get("/last-week", authenticateToken, async (req, res) => {
   try {
     const oneWeekAgo = new Date();
@@ -17,16 +16,13 @@ router.get("/last-week", authenticateToken, async (req, res) => {
 
     res.status(200).json({ tasks });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching last week's tasks",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error fetching last week's tasks",
+      error: error.message,
+    });
   }
 });
 
-// GET /report/pending - Fetch total days of work pending for all tasks
 router.get("/pending", authenticateToken, async (req, res) => {
   try {
     const tasks = await Task.find({ status: { $ne: "Completed" } });
@@ -37,19 +33,16 @@ router.get("/pending", authenticateToken, async (req, res) => {
 
     res.status(200).json({ totalPendingDays });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error calculating pending work",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error calculating pending work",
+      error: error.message,
+    });
   }
 });
 
-// GET /report/closed-tasks - Fetch the number of tasks closed by team, owner, or project
 router.get("/closed-tasks", authenticateToken, async (req, res) => {
   try {
-    const { groupBy } = req.query; // groupBy can be 'team', 'owner', or 'project'
+    const { groupBy } = req.query;
 
     let groupField;
     switch (groupBy) {
@@ -57,18 +50,16 @@ router.get("/closed-tasks", authenticateToken, async (req, res) => {
         groupField = "$team";
         break;
       case "owner":
-        groupField = "$owners"; // This will group by array, might need adjustment
+        groupField = "$owners";
         break;
       case "project":
         groupField = "$project";
         break;
       default:
-        return res
-          .status(400)
-          .json({
-            message:
-              "Invalid groupBy parameter. Use 'team', 'owner', or 'project'.",
-          });
+        return res.status(400).json({
+          message:
+            "Invalid groupBy parameter. Use 'team', 'owner', or 'project'.",
+        });
     }
 
     const report = await Task.aggregate([
@@ -78,12 +69,10 @@ router.get("/closed-tasks", authenticateToken, async (req, res) => {
 
     res.status(200).json({ report });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error generating closed tasks report",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error generating closed tasks report",
+      error: error.message,
+    });
   }
 });
 
